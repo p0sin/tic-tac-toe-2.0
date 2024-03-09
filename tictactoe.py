@@ -1,5 +1,6 @@
 import sys
 import pygame
+import random
 import numpy as np
 
 from constants import *
@@ -14,7 +15,7 @@ class Board:
 
     def __init__(self) -> None:
         self.squares = np.zeros( (ROWS, COLS) )
-        self.empty_sqr = self.squares # [squares]
+        self.empty_sqrs = self.squares # [squares]
         self.marked_sqrs = 0
 
     def final_state(self):
@@ -61,18 +62,46 @@ class Board:
     
     def get_empty_sqrs(self):
         empty_sqrs = []
-        for row in range (ROWS):
-            for col in range (COLS):
+        for row in range(ROWS):
+            for col in range(COLS):
                 if self.empty_sqr(row, col):
                     empty_sqrs.append( (row, col) )
+
+        return empty_sqrs
+
+class AI:
+
+    def __init__(self, level=1, player=2):
+        self.level = level
+        self.player = player
+
+    def rnd(self, board):
+        empty_sqrs = board.get_empty_sqrs()
+        idx = random.randrange(0, len(empty_sqrs))
+
+        return empty_sqrs[idx] # (row , col)
+    
+    def minimax(self, board, maximizing):
+        pass
+
+    def eval(self, main_board):
+        if self.level == 0:
+            # random choice
+            move = self.rnd(main_board)
+
+        else:
+            # minimax algo choice
+            self.minimax(main_board, False)
+
+        return move # row, col
 
 class Game:
 
     def __init__(self):
         self.board = Board()
-        # self.ai = AI()
+        self.ai = AI()
         self.player = 1 # 1-cross / 2-circles
-        self.gamemode = 'pvp' # pvp or ai
+        self.gamemode = 'ai' # pvp or ai
         self.running = True
         self.show_lines()
 
@@ -107,12 +136,12 @@ class Game:
         self.player = self.player % 2 + 1
         
 
-
 def main():
 
     # object
     game = Game()
     board = game.board
+    ai = game.ai
     
     while True:
 
@@ -133,7 +162,17 @@ def main():
                     board.mark_sqr(row, col, game.player)
                     game.draw_fig(row, col)
                     game.next_turn()
-                
+
+        if game.gamemode == "ai" and game.player == ai.player:
+            # update screen
+            pygame.display.update()   
+
+            # ai method   
+            row, col = ai.eval(board)
+
+            board.mark_sqr(row, col, ai.player)
+            game.draw_fig(row, col)
+            game.next_turn()          
                 
         pygame.display.update()
 
