@@ -10,24 +10,70 @@ screen =  pygame.display.set_mode( (WIDTH, HEIGHT) )
 pygame.display.set_caption('TIC TAC TOE 2.0')
 screen.fill( BG_COLOR)
 
-class Board():
+class Board:
 
     def __init__(self) -> None:
         self.squares = np.zeros( (ROWS, COLS) )
+        self.empty_sqr = self.squares # [squares]
+        self.marked_sqrs = 0
+
+    def final_state(self):
+        # return 0 if there is no win yet
+        # return 1 if player 1 wins
+        # return 2 if player 2 wins
         
+
+        # vertical wins
+        for col in range(COLS):
+            if self.squares[0][col] == self.squares[1][col] == self.squares[2][col] != 0:
+                return self.squares[0][col]
+            
+        # horizontal wins
+        for row in range(ROWS):
+            if self.square[row][0] == self.squares[row][1] == self.squares[row][2] !=0:
+                return self.squares[row][0]
+
+        # desc diagonal
+        if self.squares[0][0] == self.squares[1][1] == self.squares[2][2] != 0:
+            return self.squares [1][1]
+        
+        # asc diagonal
+        if self.squares[2][0] == self.squares[1][1] == self.squares[0][2] != 0:
+            return self.squares [1][1]
+            
+        # no win yet
+        return 0
+    
+
+
     def mark_sqr(self, row, col, player):
         self.squares[row][col] = player
+        self.marked_sqrs += 1
 
     def empty_sqr(self, row, col):
         return self.squares[row][col] == 0
 
-
+    def isful(self):
+        return self.marked_sqrs == 9
+    
+    def isempty(self):
+        return self.marked_sqrs == 0
+    
+    def get_empty_sqrs(self):
+        empty_sqrs = []
+        for row in range (ROWS):
+            for col in range (COLS):
+                if self.empty_sqr(row, col):
+                    empty_sqrs.append( (row, col) )
 
 class Game:
 
     def __init__(self):
         self.board = Board()
+        # self.ai = AI()
         self.player = 1 # 1-cross / 2-circles
+        self.gamemode = 'pvp' # pvp or ai
+        self.running = True
         self.show_lines()
 
     def show_lines(self):
@@ -90,9 +136,6 @@ def main():
                 
                 
         pygame.display.update()
-
-
-
 
 
 main()
